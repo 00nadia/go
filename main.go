@@ -2,10 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
@@ -59,17 +59,15 @@ func main() {
 		panic(err)
 	}
 
-	router := gin.Default()
+	newinfoTest, err := json.Marshal(infoTest)
+	if err != nil {
+		panic(err)
+	}
 
-	router.GET("/show", func(c *gin.Context) {
-		c.IndentedJSON(http.StatusOK, infoTest)
+	http.HandleFunc("/show", func(w http.ResponseWriter, r *http.Request) {
+		w.Write(newinfoTest)
 	})
 
-	router.GET("/hello", func(c *gin.Context) {
-		c.String(http.StatusOK, "hello")
-
-	})
-
-	router.Run("localhost:4000")
+	http.ListenAndServe(":4000", nil)
 
 }
